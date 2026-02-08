@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
 import styles from "./login.module.css";
-
+import axios from 'axios';
+import {useRouter} from "next/navigation";
 const defaultData = { username: "", password: "" };
 
 function Login() {
   const [data, setData] = useState(defaultData);
-
+  const router = useRouter();
   const onValueChange = (e) => {
     setData({
       ...data,
@@ -14,7 +15,7 @@ function Login() {
     });
   };
 
-  const onLogin = (e) => {
+  const onLogin = async(e) => {
     e.preventDefault();
 
     if (!data.username || !data.password) {
@@ -22,7 +23,32 @@ function Login() {
       return;
     }
 
-    console.log("Registered Data:", data);
+    // Api Call
+    try{
+      const response = await axios.post("api/users/login", data);
+      setData(defaultData);
+
+      if(response.status === 200){
+        router.push("/profile");
+      }
+    }
+    catch (error){
+      console.log(error);
+      
+      if (error.response) {
+        const errorMessage = error.response.data;
+        
+        if (errorMessage.includes("Username does not exist")) {
+          alert("Username does not exist");
+        } else if (errorMessage.includes("Incorrect Password")) {
+          alert("Incorrect Password");
+        } else {
+          alert(errorMessage || "An error occurred. Please try again.");
+        }
+      } else {
+        alert("An error occurred. Please try again.");
+      }
+    }
   };
 
   return (

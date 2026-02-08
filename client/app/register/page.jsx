@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
 import styles from "./register.module.css";
+import axios from 'axios';
+import {useRouter} from "next/navigation";
 
 const defaultData = { name: "", username: "", password: "" };
 
 function Register() {
   const [data, setData] = useState(defaultData);
+  const router = useRouter();
 
   const onValueChange = (e) => {
     setData({
@@ -14,7 +17,7 @@ function Register() {
     });
   };
 
-  const onRegister = (e) => {
+  const onRegister = async(e) => {
     e.preventDefault();
 
     if (!data.name || !data.username || !data.password) {
@@ -22,7 +25,18 @@ function Register() {
       return;
     }
 
-    console.log("Registered Data:", data);
+    // Api Call
+    try{
+      const response = await axios.post("api/users/register", data);
+      setData(defaultData);
+
+      if(response.status === 200){
+        router.push("/login");
+      }
+    }
+    catch (error){
+      console.log(error);
+    }
   };
 
   return (
