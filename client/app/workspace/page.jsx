@@ -24,34 +24,50 @@ export default function Page() {
   }, []);
 
   const buttonAction = async (action, slug, initialQuantity) => {
-    const updated = [...products];
-    const index = updated.findIndex((p) => p.slug === slug);
+  const newQuantity = action === "plus" ? initialQuantity + 1 : initialQuantity - 1;
 
-    updated[index].quantity =
-      action === "plus" ? initialQuantity + 1 : initialQuantity - 1;
+  // 1. Update the Dropdown state (what you see while searching)
+  const updatedDropdown = dropdown.map(item => 
+    item.slug === slug ? { ...item, quantity: newQuantity } : item
+  );
+  setDropdown(updatedDropdown);
 
-    setProducts(updated);
+  // 2. Update the Products state (the main table)
+  const updatedProducts = products.map(item => 
+    item.slug === slug ? { ...item, quantity: newQuantity } : item
+  );
+  setProducts(updatedProducts);
 
-    setLoadingAction(true);
-    await fetch("/api/action", {
+  // 3. Send to Database
+  setLoadingAction(true);
+  try {
+    await fetch("/api/users/action", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, slug, initialQuantity }),
     });
+  } catch (error) {
+    console.error("Failed to update quantity", error);
+    // Optional: Revert state if the API fails
+  } finally {
     setLoadingAction(false);
-  };
+  }
+};
 
   const addProduct = async (e) => {
-    e.preventDefault();
-    await fetch("/api/users/product", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productForm),
-    });
+  e.preventDefault();
+  const response = await fetch("/api/users/product", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(productForm),
+  });
+
+  if (response.ok) {
+    setProducts([...products, productForm]); // Add to local state immediately
     setAlert("Product added successfully!");
     setProductForm({});
-    fetchProducts();
-  };
+  }
+};
 
   const handleChange = (e) => {
     setProductForm({ ...productForm, [e.target.name]: e.target.value });
