@@ -18,7 +18,7 @@ export const ChatProvider = ({ children }) => {
   const getHeaders = () => ({
     headers: { token: localStorage.getItem("token") },
   });
-
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   async function fetchResponse() {
     if (prompt === "") return alert("Write prompt");
 
@@ -33,7 +33,7 @@ export const ChatProvider = ({ children }) => {
 
     try {
       const response = await axios({
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyAG-Tic8zwGo3YYKcsks2TOpjewOiAO7aw`,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         method: "post",
         data: {
           system_instruction: {
