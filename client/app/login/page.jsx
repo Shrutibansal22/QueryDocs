@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import styles from "./login.module.css";
-import axios from 'axios';
-import {useRouter} from "next/navigation";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const defaultData = { username: "", password: "" };
 
 function Login() {
@@ -15,7 +15,7 @@ function Login() {
     });
   };
 
-  const onLogin = async(e) => {
+  const onLogin = async (e) => {
     e.preventDefault();
 
     if (!data.username || !data.password) {
@@ -24,20 +24,19 @@ function Login() {
     }
 
     // Api Call
-    try{
+    try {
       const response = await axios.post("api/users/login", data);
       setData(defaultData);
 
-      if(response.status === 200){
+      if (response.status === 200) {
         router.push("/profile");
       }
-    }
-    catch (error){
+    } catch (error) {
       console.log(error);
-      
+
       if (error.response) {
         const errorMessage = error.response.data;
-        
+
         if (errorMessage.includes("Username does not exist")) {
           alert("Username does not exist");
         } else if (errorMessage.includes("Incorrect Password")) {
@@ -57,7 +56,6 @@ function Login() {
         <h2>Login</h2>
 
         <form onSubmit={onLogin}>
-
           <div className={styles.inputGroup}>
             <input
               type="text"
@@ -83,6 +81,14 @@ function Login() {
           </button>
         </form>
 
+        <button
+          type="button"
+          className={styles.otpBtn}
+          onClick={() => router.push("/login/otp")}
+        >
+          Login with OTP
+        </button>
+
         <p className={styles.loginText}>
           Don't have an account? <a href="/register">Register here</a>
         </p>
@@ -90,6 +96,5 @@ function Login() {
     </div>
   );
 }
-
 
 export default Login;

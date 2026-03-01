@@ -1,0 +1,18 @@
+"use client";
+
+import React from "react";
+import { ChatData } from "@/context/ChatContext";
+
+const Header = () => {
+  const { chats } = ChatData();
+  return (
+    <div>
+      <p className="text-lg mb-6">Hello, How can I help you today?</p>
+      {chats && chats.length === 0 && (
+        <p className="text-lg mb-6 text-gray-400">Create a new chat to continue</p>
+      )}
+    </div>
+  );
+};
+
+export default Header;

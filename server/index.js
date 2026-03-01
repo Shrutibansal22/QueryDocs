@@ -1,15 +1,18 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDb from "./database/db.js";
-// import cors from "cors";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 
-// using middleware
 app.use(express.json());
-// app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "token", "verifyToken"],
+}));
 
 //importing routes
 import userRoutes from "./routes/userRoutes.js";
