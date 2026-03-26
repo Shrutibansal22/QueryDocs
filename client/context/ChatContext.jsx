@@ -14,6 +14,8 @@ export const ChatProvider = ({ children }) => {
   const [selected, setSelected] = useState(null);
   const [createLod, setCreateLod] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentMood, setCurrentMood] = useState("neutral");
+  const [currentRecommendations, setCurrentRecommendations] = useState([]);
 
   const getHeaders = () => ({
     headers: { token: localStorage.getItem("token") },
@@ -64,6 +66,28 @@ export const ChatProvider = ({ children }) => {
 
       const backendUrl = server || "http://localhost:5000";
 
+      // Get mood detection and recommendations
+      try {
+        console.log("Fetching recommendations for mood detection...");
+        const moodResponse = await axios.post(
+          `${backendUrl}/api/recommendation/detect-mood`,
+          { question: currentPrompt },
+          getHeaders(),
+        );
+        console.log("Mood response:", moodResponse.data);
+        setCurrentMood(moodResponse.data.mood);
+        setCurrentRecommendations(moodResponse.data.recommendations);
+      } catch (moodError) {
+        console.error("Mood detection failed:", moodError.message);
+        if (moodError.response) {
+          console.error("Error response:", moodError.response.data);
+        }
+        // Set default mood instead of silent failure
+        setCurrentMood("neutral");
+        setCurrentRecommendations([]);
+      }
+
+      // Save to backend
       await axios.post(
         `${backendUrl}/api/chat/${selected}`,
         { question: currentPrompt, answer: aiAnswer },
@@ -155,6 +179,10 @@ export const ChatProvider = ({ children }) => {
         setLoading,
         deleteChat,
         fetchChats,
+        currentMood,
+        setCurrentMood,
+        currentRecommendations,
+        setCurrentRecommendations,
       }}
     >
       {children}

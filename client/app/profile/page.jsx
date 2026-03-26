@@ -11,7 +11,7 @@ function Profile() {
         const response = await axios.get('/api/users/logout');
 
         if (response.status === 200) {
-            router.push('/login');
+            router.push('/register');
         }
     }
 

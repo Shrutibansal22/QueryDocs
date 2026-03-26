@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserData } from "@/context/UserContext";
-import styles from "../../login.module.css";
+import styles from "../styles.module.css";
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState("");

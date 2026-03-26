@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
 
       toast.success(data.message);
       localStorage.setItem("verifyToken", data.verifyToken);
-      router.push("/login/otp/verify"); 
+      router.push("/register/verify"); 
       setBtnLoading(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
@@ -101,7 +101,7 @@ export const UserProvider = ({ children }) => {
     toast.success("Logged out");
     setIsAuth(false);
     setUser([]);
-    router.push("/login");
+    router.push("/register");
   };
 
   useEffect(() => {
