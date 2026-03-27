@@ -1,5 +1,18 @@
 import { Chat } from "../models/Chat.js";
 import { Conversation } from "../models/Conversation.js";
+import { Recommendation } from "../models/Recommendation.js";
+import Sentiment from "sentiment";
+
+const sentiment = new Sentiment();
+
+// Map mood scores to mood categories
+const getMoodCategory = (score) => {
+  if (score >= 3) return "happy";
+  if (score >= 1) return "neutral";
+  if (score >= -1) return "stressed";
+  if (score > -3) return "anxious";
+  return "angry";
+};
 
 export const createChat = async (req, res) => {
   try {
@@ -40,11 +53,26 @@ export const addConversation = async (req, res) => {
         message: "No chat with this id",
       });
 
+    // Analyze sentiment from the question
+    const result = sentiment.analyze(req.body.question);
+    const moodScore = result.score;
+    const mood = getMoodCategory(moodScore);
+
+    // Fetch recommendations based on mood
+    const recommendations = await Recommendation.find({ mood }).limit(3);
+    const recommendationIds = recommendations.map((r) => r._id);
+
     const conversation = await Conversation.create({
       chat: chat._id,
       question: req.body.question,
       answer: req.body.answer,
+      mood,
+      moodScore,
+      recommendations: recommendationIds,
     });
+
+    // Populate recommendations before sending response
+    await conversation.populate("recommendations");
 
     const updatedChat = await Chat.findByIdAndUpdate(
       req.params.id,
@@ -65,7 +93,9 @@ export const addConversation = async (req, res) => {
 
 export const getConversation = async (req, res) => {
   try {
-    const conversation = await Conversation.find({ chat: req.params.id });
+    const conversation = await Conversation.find({
+      chat: req.params.id,
+    }).populate("recommendations");
 
     if (!conversation)
       return res.status(404).json({

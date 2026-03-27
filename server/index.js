@@ -14,13 +14,13 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "token", "verifyToken"],
 }));
 
-//importing routes
 import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import recommendationRoutes from "./routes/recommendationRoutes.js";
 
-// //using routes
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/recommendation", recommendationRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`server is working on port ${process.env.PORT}`);

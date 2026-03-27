@@ -15,6 +15,21 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mood: {
+      type: String,
+      enum: ["happy", "sad", "stressed", "anxious", "angry", "neutral"],
+      default: "neutral",
+    },
+    moodScore: {
+      type: Number,
+      default: 0,
+    },
+    recommendations: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Recommendation",
+      },
+    ],
   },
   {
     timestamps: true,
