@@ -2,6 +2,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { UserData } from "./UserContext";
 
 const server = process.env.NEXT_PUBLIC_SERVER || "http://localhost:5000";
 const ChatContext = createContext();
@@ -16,6 +17,8 @@ export const ChatProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [currentMood, setCurrentMood] = useState("neutral");
   const [currentRecommendations, setCurrentRecommendations] = useState([]);
+  
+  const { isAuth } = UserData();
 
   const getHeaders = () => ({
     headers: { token: localStorage.getItem("token") },
@@ -157,6 +160,13 @@ export const ChatProvider = ({ children }) => {
   useEffect(() => {
     fetchChats();
   }, []);
+
+  // Fetch chats when user becomes authenticated
+  useEffect(() => {
+    if (isAuth) {
+      fetchChats();
+    }
+  }, [isAuth]);
 
   useEffect(() => {
     if (selected) fetchMessages();
